@@ -15,7 +15,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 // CORS configuration
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://cashyo.jakariya.eu.org"],
+  })
+);
 
 // Root route
 app.get("/", (req: Request, res: Response) => {
