@@ -1,5 +1,5 @@
 import cookieParser from "cookie-parser";
-import cors, { CorsOptions } from "cors";
+import cors from "cors";
 import dotenv from "dotenv";
 import express, { Application, Request, Response } from "express";
 import errorHandler from "./middlewares/error.middleware";
@@ -10,25 +10,8 @@ dotenv.config();
 
 const app: Application = express();
 
-// CORS Configuration
-const corsOptions: CorsOptions = {
-  origin: (origin: string | undefined, callback) => {
-    if (!origin) {
-      return callback(null, true);
-    }
-
-    // regex: match subdomains + main domain
-    const regex = /^https?:\/\/([a-z0-9-]+\.)*jakariya\.eu\.org$/;
-
-    if (regex.test(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-};
-
-app.use(cors(corsOptions));
+// CORS
+app.use(cors());
 
 // Middleware
 app.use(express.json());
