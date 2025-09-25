@@ -12,13 +12,13 @@ const routes_1 = __importDefault(require("./routes"));
 const responseHandler_1 = require("./utils/responseHandler");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
+// Middleware
+app.use(express_1.default.json());
+app.use((0, cookie_parser_1.default)());
 // CORS configuration
 app.use((0, cors_1.default)({
     origin: ["http://localhost:5173"],
 }));
-// Middleware
-app.use(express_1.default.json());
-app.use((0, cookie_parser_1.default)());
 // Root route
 app.get("/", (req, res) => {
     res.status(200).json((0, responseHandler_1.successResponse)({

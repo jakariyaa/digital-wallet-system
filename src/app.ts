@@ -10,16 +10,16 @@ dotenv.config();
 
 const app: Application = express();
 
+// Middleware
+app.use(express.json());
+app.use(cookieParser());
+
 // CORS configuration
 app.use(
   cors({
     origin: ["http://localhost:5173"],
   })
 );
-
-// Middleware
-app.use(express.json());
-app.use(cookieParser());
 
 // Root route
 app.get("/", (req: Request, res: Response) => {
