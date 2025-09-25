@@ -15,11 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // CORS configuration
-app.use(
-  cors({
-    origin: ["http://localhost:5173"],
-  })
-);
+app.use(cors());
 
 // Root route
 app.get("/", (req: Request, res: Response) => {
