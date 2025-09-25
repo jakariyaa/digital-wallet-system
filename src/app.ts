@@ -1,5 +1,4 @@
 import cookieParser from "cookie-parser";
-import cors from "cors";
 import dotenv from "dotenv";
 import express, { Application, Request, Response } from "express";
 import errorHandler from "./middlewares/error.middleware";
@@ -9,9 +8,6 @@ import { errorResponse, successResponse } from "./utils/responseHandler";
 dotenv.config();
 
 const app: Application = express();
-
-// CORS
-app.use(cors());
 
 // Middleware
 app.use(express.json());
