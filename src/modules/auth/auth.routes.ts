@@ -1,13 +1,14 @@
 // src/modules/auth/auth.routes.ts
 
-import express from 'express';
-import { register, login } from './auth.controller';
-import validate from '../../middlewares/validation.middleware';
-import { registerSchema, loginSchema } from '../../validation/user.validation';
+import express from "express";
+import validate from "../../middlewares/validation.middleware";
+import { loginSchema, registerSchema } from "../../validation/user.validation";
+import { login, logout, register } from "./auth.controller";
 
 const router = express.Router();
 
-router.post('/register', validate(registerSchema), register);
-router.post('/login', validate(loginSchema), login);
+router.post("/register", validate(registerSchema), register);
+router.post("/login", validate(loginSchema), login);
+router.post("/logout", logout);
 
 export default router;
