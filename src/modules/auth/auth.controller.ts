@@ -46,8 +46,8 @@ export const register = async (
     // Set token in HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -100,8 +100,8 @@ export const login = async (
     // Set token in HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -123,12 +123,7 @@ export const logout = (req: Request, res: Response) => {
   if (!req.cookies || !req.cookies.token) {
     return res.status(200).json(successResponse(null, "No active session"));
   }
-  res.cookie("token", "", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    expires: new Date(0),
-  });
+  res.cookie("token", "");
 
   res.status(200).json(successResponse(null, "Logged out successfully"));
 };
