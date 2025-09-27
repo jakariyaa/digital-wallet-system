@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import AppError from "../../utils/AppError";
 import { successResponse } from "../../utils/responseHandler";
+import setCookie from "../../utils/setCookie";
 import { LoginInput, RegisterInput } from "../../validation/user.validation";
 import User from "../user/user.model";
 
@@ -44,12 +45,7 @@ export const register = async (
     (user as any).password = undefined;
 
     // Set token in HTTP-only cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    setCookie(res, token);
 
     res.status(201).json(
       successResponse(
@@ -98,12 +94,7 @@ export const login = async (
     (user as any).password = undefined;
 
     // Set token in HTTP-only cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    setCookie(res, token);
 
     res.status(200).json(
       successResponse(
@@ -124,6 +115,5 @@ export const logout = (req: Request, res: Response) => {
     return res.status(200).json(successResponse(null, "No active session"));
   }
   res.cookie("token", "");
-
   res.status(200).json(successResponse(null, "Logged out successfully"));
 };
