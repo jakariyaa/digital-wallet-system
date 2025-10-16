@@ -1,4 +1,4 @@
-// src/modules/transaction/transaction.model.ts
+
 
 import mongoose, { Schema } from "mongoose";
 import { TransactionDocument } from "../../types/transaction.types";
@@ -60,7 +60,7 @@ const transactionSchema = new Schema<TransactionDocument>(
   }
 );
 
-// Indexes
+
 transactionSchema.index({ initiatedBy: 1 });
 transactionSchema.index({ fromWalletId: 1 });
 transactionSchema.index({ toWalletId: 1 });

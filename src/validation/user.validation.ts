@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// User registration schema
+
 export const registerSchema = z.object({
   body: z.object({
     name: z.string().min(1, 'Name is required').max(50, 'Name cannot exceed 50 characters'),
@@ -10,7 +10,7 @@ export const registerSchema = z.object({
   }),
 });
 
-// User login schema
+
 export const loginSchema = z.object({
   body: z.object({
     email: z.string().email('Invalid email format'),
@@ -18,7 +18,7 @@ export const loginSchema = z.object({
   }),
 });
 
-// Approve agent schema
+
 export const approveAgentSchema = z.object({
   params: z.object({
     id: z.string().min(1, 'User ID is required'),
@@ -28,7 +28,7 @@ export const approveAgentSchema = z.object({
   }),
 });
 
-// Type exports for use in controllers
+
 export type RegisterInput = z.infer<typeof registerSchema>['body'];
 export type LoginInput = z.infer<typeof loginSchema>['body'];
 export type ApproveAgentInput = z.infer<typeof approveAgentSchema>;

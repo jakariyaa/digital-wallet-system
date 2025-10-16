@@ -10,7 +10,7 @@ export default function errorHandler(
 ) {
   console.error(err.stack);
 
-  // Handle mongoose validation errors
+  
   if (err.name === "ValidationError") {
     const errors = Object.values(err.errors).map((el: any) => el.message);
     return res
@@ -18,14 +18,14 @@ export default function errorHandler(
       .json(errorResponse("Validation failed", 400, errors));
   }
 
-  // Handle mongoose duplicate field errors
+  
   if (err.code === 11000) {
     return res
       .status(400)
       .json(errorResponse("Duplicate field value entered", 400));
   }
 
-  // Handle JWT errors
+  
   if (err.name === "JsonWebTokenError") {
     return res.status(401).json(errorResponse("Invalid token", 401));
   }
@@ -34,14 +34,14 @@ export default function errorHandler(
     return res.status(401).json(errorResponse("Token expired", 401));
   }
 
-  // AppError
+  
   if (err instanceof AppError) {
     return res
       .status(err.statusCode)
       .json(errorResponse(err.message, err.statusCode));
   }
 
-  // Default error
+  
   res
     .status(500)
     .json(

@@ -1,4 +1,4 @@
-// src/types/transaction.types.ts
+
 
 import mongoose, { Types } from "mongoose";
 
@@ -12,7 +12,7 @@ export interface ITransaction {
   fromWalletId?: Types.ObjectId;
   toWalletId?: Types.ObjectId;
   systemWallet?: string;
-  initiatedBy: Types.ObjectId; // userId of the person initiating the transaction
+  initiatedBy: Types.ObjectId; 
   status: "pending" | "completed" | "failed";
   createdAt: Date;
   updatedAt: Date;

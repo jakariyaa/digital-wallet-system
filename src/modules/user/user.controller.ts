@@ -1,12 +1,12 @@
-// src/modules/user/user.controller.ts
 
-import { Request, Response, NextFunction } from 'express';
-import User from './user.model';
+
+import { NextFunction, Request, Response } from 'express';
 import AppError from '../../utils/AppError';
-import { successResponse, errorResponse } from '../../utils/responseHandler';
+import { successResponse } from '../../utils/responseHandler';
 import { ApproveAgentInput } from '../../validation/user.validation';
+import User from './user.model';
 
-// Get all users (admin only)
+
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await User.find().select('-password');
@@ -22,24 +22,24 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// Approve/suspend agent (admin only)
+
 export const approveAgent = async (req: Request<ApproveAgentInput['params'], {}, ApproveAgentInput['body']>, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const { isApproved } = req.body;
 
-    // Find user by ID
+    
     const user = await User.findById(id);
     if (!user) {
       return next(new AppError('User not found', 404));
     }
 
-    // Check if user is an agent
+    
     if (user.role !== 'agent') {
       return next(new AppError('User is not an agent', 400));
     }
 
-    // Update approval status
+    
     user.isApproved = isApproved;
     await user.save();
 

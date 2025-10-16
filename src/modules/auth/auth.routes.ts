@@ -1,4 +1,4 @@
-// src/modules/auth/auth.routes.ts
+
 
 import express from "express";
 import validate from "../../middlewares/validation.middleware";

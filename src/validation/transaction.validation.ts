@@ -1,25 +1,25 @@
 import { z } from 'zod';
 
-// Base transaction schema with common fields
+
 const baseTransactionSchema = {
   amount: z.number().positive('Amount must be greater than 0'),
 };
 
-// Add money schema (User)
+
 export const addMoneySchema = z.object({
   body: z.object({
     ...baseTransactionSchema,
   }),
 });
 
-// Withdraw money schema (User)
+
 export const withdrawMoneySchema = z.object({
   body: z.object({
     ...baseTransactionSchema,
   }),
 });
 
-// Send money schema (User)
+
 export const sendMoneySchema = z.object({
   body: z.object({
     ...baseTransactionSchema,
@@ -27,7 +27,7 @@ export const sendMoneySchema = z.object({
   }),
 });
 
-// Cash-in schema (Agent)
+
 export const cashInSchema = z.object({
   body: z.object({
     ...baseTransactionSchema,
@@ -35,7 +35,7 @@ export const cashInSchema = z.object({
   }),
 });
 
-// Cash-out schema (Agent)
+
 export const cashOutSchema = z.object({
   body: z.object({
     ...baseTransactionSchema,
@@ -43,7 +43,7 @@ export const cashOutSchema = z.object({
   }),
 });
 
-// Type exports for use in controllers
+
 export type AddMoneyInput = z.infer<typeof addMoneySchema>['body'];
 export type WithdrawMoneyInput = z.infer<typeof withdrawMoneySchema>['body'];
 export type SendMoneyInput = z.infer<typeof sendMoneySchema>['body'];

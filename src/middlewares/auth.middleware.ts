@@ -1,4 +1,4 @@
-// src/middlewares/auth.middleware.ts
+
 
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
@@ -6,7 +6,7 @@ import User from "../modules/user/user.model";
 import { UserDocument } from "../types/user.types";
 import AppError from "../utils/AppError";
 
-// Extend Express Request type
+
 declare global {
   namespace Express {
     interface Request {
@@ -26,7 +26,7 @@ export const protect = async (
   next: NextFunction
 ) => {
   try {
-    // 1) Get token from cookie and check if it exists
+    
     const token = req.cookies.token;
     if (!token) {
       return next(
@@ -34,13 +34,13 @@ export const protect = async (
       );
     }
 
-    // 2) Verify token
+    
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET as string
     ) as JwtPayload;
 
-    // 3) Check if user still exists
+    
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
       return next(
@@ -51,17 +51,17 @@ export const protect = async (
       );
     }
 
-    // 4) Check if user is active
+    
     if (!currentUser.isActive) {
       return next(new AppError("This user account has been deactivated.", 401));
     }
 
-    // 5) For agents, check if approved
+    
     if (currentUser.role === "agent" && !currentUser.isApproved) {
       return next(new AppError("Agent account is not approved yet", 401));
     }
 
-    // GRANT ACCESS TO PROTECTED ROUTE
+    
     req.user = currentUser;
     next();
   } catch (error: any) {
@@ -77,7 +77,7 @@ export const protect = async (
   }
 };
 
-// Restrict access to certain roles
+
 export const restrictTo = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {

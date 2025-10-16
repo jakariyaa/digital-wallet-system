@@ -1,4 +1,4 @@
-// src/utils/transactionFees.ts
+
 
 interface FeeConfig {
   type: "percentage" | "flat";
@@ -6,8 +6,8 @@ interface FeeConfig {
 }
 
 const TRANSACTION_FEES: { [key: string]: FeeConfig } = {
-  send: { type: "percentage", value: 0.01 }, // 1% fee for sending money
-  "cash-out": { type: "flat", value: 10 }, // Flat 10 unit fee for cash-out
+  send: { type: "percentage", value: 0.01 }, 
+  "cash-out": { type: "flat", value: 10 }, 
 };
 
 export const calculateTransactionFee = (

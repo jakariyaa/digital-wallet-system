@@ -10,11 +10,11 @@ dotenv.config();
 
 const app: Application = express();
 
-// Middleware
+
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS configuration
+
 app.use(
   cors({
     origin: ["http://localhost:5173", "https://cashyo.jakariya.eu.org"],
@@ -22,7 +22,7 @@ app.use(
   })
 );
 
-// Root route
+
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json(
     successResponse({
@@ -32,15 +32,15 @@ app.get("/", (req: Request, res: Response) => {
   );
 });
 
-// API routes
+
 app.use(router);
 
-// 404 handler
+
 app.use((req: Request, res: Response) => {
   res.status(404).json(errorResponse("Route not found", 404));
 });
 
-// Error handling middleware
+
 app.use(errorHandler);
 
 export default app;

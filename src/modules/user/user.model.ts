@@ -1,9 +1,9 @@
-// src/modules/user/user.model.ts
 
-import mongoose, { Schema, Document } from 'mongoose';
+
 import bcrypt from 'bcryptjs';
-import Wallet from '../wallet/wallet.model';
+import mongoose, { Schema } from 'mongoose';
 import { UserDocument } from '../../types/user.types';
+import Wallet from '../wallet/wallet.model';
 
 const userSchema = new Schema<UserDocument>(
   {
@@ -23,7 +23,7 @@ const userSchema = new Schema<UserDocument>(
       type: String,
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters'],
-      select: false, // Don't include password in queries by default
+      select: false, 
     },
     role: {
       type: String,
@@ -46,7 +46,7 @@ const userSchema = new Schema<UserDocument>(
   }
 );
 
-// Hash password before saving
+
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   
@@ -59,14 +59,14 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-// Create wallet after user is saved
+
 userSchema.post('save', async function (doc) {
   try {
-    // Check if wallet already exists for this user
+    
     const existingWallet = await Wallet.findOne({ userId: doc._id });
     
     if (!existingWallet) {
-      // Create wallet with initial balance
+      
       const initialBalance = parseInt(process.env.INITIAL_WALLET_BALANCE || '50');
       await Wallet.create({
         userId: doc._id,
@@ -79,14 +79,14 @@ userSchema.post('save', async function (doc) {
   }
 });
 
-// Compare password method
+
 userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Indexes
-// The 'unique: true' option on the email field already creates an index
-// This line is intentionally left blank to avoid duplicate indexes
+
+
+
 
 const User = mongoose.model<UserDocument>('User', userSchema);
 

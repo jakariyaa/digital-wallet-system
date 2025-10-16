@@ -1,4 +1,4 @@
-// src/utils/responseHandler.ts
+
 
 export const successResponse = (data: any, message: string = 'Success', statusCode: number = 200) => {
   return {

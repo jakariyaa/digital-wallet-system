@@ -1,4 +1,4 @@
-// src/modules/auth/auth.controller.ts
+
 
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
@@ -8,14 +8,14 @@ import setCookie from "../../utils/setCookie";
 import { LoginInput, RegisterInput } from "../../validation/user.validation";
 import User from "../user/user.model";
 
-// Generate JWT token
+
 const signToken = (id: string, role: string) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET as string, {
-    expiresIn: 7 * 24 * 60 * 60, // 7 days in seconds
+    expiresIn: 7 * 24 * 60 * 60, 
   });
 };
 
-// Register new user
+
 export const register = async (
   req: Request<{}, {}, RegisterInput>,
   res: Response,
@@ -24,27 +24,27 @@ export const register = async (
   try {
     const { name, email, password, role = "user" } = req.body;
 
-    // Check if user already exists
+    
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return next(new AppError("User with this email already exists", 400));
     }
 
-    // Create new user
+    
     const user = await User.create({
       name,
       email,
       password,
-      role, // Allow specifying role for testing
+      role, 
     });
 
-    // Generate token
+    
     const token = signToken(user._id.toString(), user.role);
 
-    // Remove password from output
+    
     (user as any).password = undefined;
 
-    // Set token in HTTP-only cookie
+    
     setCookie(res, token);
 
     res.status(201).json(
@@ -61,7 +61,7 @@ export const register = async (
   }
 };
 
-// Login user
+
 export const login = async (
   req: Request<{}, {}, LoginInput>,
   res: Response,
@@ -70,30 +70,30 @@ export const login = async (
   try {
     const { email, password } = req.body;
 
-    // Check if user exists and password is correct
+    
     const user = await User.findOne({ email }).select("+password");
 
     if (!user || !(await user.comparePassword(password))) {
       return next(new AppError("Incorrect email or password", 401));
     }
 
-    // Check if user is active
+    
     if (!user.isActive) {
       return next(new AppError("User account is deactivated", 401));
     }
 
-    // For agents, check if approved
+    
     if (user.role === "agent" && !user.isApproved) {
       return next(new AppError("Agent account is not approved yet", 401));
     }
 
-    // Generate token
+    
     const token = signToken(user._id.toString(), user.role);
 
-    // Remove password from output
+    
     (user as any).password = undefined;
 
-    // Set token in HTTP-only cookie
+    
     setCookie(res, token);
 
     res.status(200).json(
@@ -109,7 +109,7 @@ export const login = async (
   }
 };
 
-// Logout user
+
 export const logout = (req: Request, res: Response) => {
   if (!req.cookies || !req.cookies.token) {
     return res.status(200).json(successResponse(null, "No active session"));

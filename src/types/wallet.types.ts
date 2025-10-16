@@ -1,4 +1,4 @@
-// src/types/wallet.types.ts
+
 
 import mongoose, { Types } from 'mongoose';
 

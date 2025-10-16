@@ -1,23 +1,22 @@
-// src/modules/transaction/transaction.controller.ts
 
-import { Request, Response, NextFunction } from "express";
+
+import { NextFunction, Request, Response } from "express";
 import mongoose, { ClientSession } from "mongoose";
+import AppError from "../../utils/AppError";
+import { successResponse } from "../../utils/responseHandler";
+import { calculateTransactionFee } from "../../utils/transactionFees";
+import {
+    AddMoneyInput,
+    CashInInput,
+    CashOutInput,
+    SendMoneyInput,
+    WithdrawMoneyInput
+} from "../../validation/transaction.validation";
+import User from "../user/user.model";
 import Wallet from "../wallet/wallet.model";
 import Transaction from "./transaction.model";
-import User from "../user/user.model";
-import AppError from "../../utils/AppError";
-import { successResponse, errorResponse } from "../../utils/responseHandler";
-import { calculateTransactionFee } from "../../utils/transactionFees";
-import { UserDocument } from "../../types/user.types";
-import { 
-  AddMoneyInput, 
-  WithdrawMoneyInput, 
-  SendMoneyInput, 
-  CashInInput, 
-  CashOutInput 
-} from "../../validation/transaction.validation";
 
-// Helper function to check if wallet is active
+
 const checkWalletActive = async (walletId: mongoose.Types.ObjectId) => {
   const wallet = await Wallet.findById(walletId);
   if (!wallet) {
@@ -29,7 +28,7 @@ const checkWalletActive = async (walletId: mongoose.Types.ObjectId) => {
   return wallet;
 };
 
-// Add money to own wallet (User)
+
 export const addMoney = async (
   req: Request<{}, {}, AddMoneyInput>,
   res: Response,
@@ -45,7 +44,7 @@ export const addMoney = async (
     const { amount } = req.body;
 
     await session.withTransaction(async () => {
-      // Get user's wallet
+      
       const wallet = await Wallet.findOne({ userId: req.user!._id }).session(
         session
       );
@@ -54,16 +53,16 @@ export const addMoney = async (
         throw new AppError("Wallet not found", 404);
       }
 
-      // Check if wallet is active
+      
       if (!wallet.isActive) {
         throw new AppError("Wallet is blocked", 400);
       }
 
-      // Update wallet balance
+      
       wallet.balance += amount;
       await wallet.save({ session });
 
-      // Create transaction record
+      
       const transaction = await Transaction.create(
         [
           {
@@ -94,7 +93,7 @@ export const addMoney = async (
   }
 };
 
-// Withdraw money from own wallet (User)
+
 export const withdrawMoney = async (
   req: Request<{}, {}, WithdrawMoneyInput>,
   res: Response,
@@ -110,7 +109,7 @@ export const withdrawMoney = async (
     const { amount } = req.body;
 
     await session.withTransaction(async () => {
-      // Get user's wallet
+      
       const wallet = await Wallet.findOne({ userId: req.user!._id }).session(
         session
       );
@@ -119,21 +118,21 @@ export const withdrawMoney = async (
         throw new AppError("Wallet not found", 404);
       }
 
-      // Check if wallet is active
+      
       if (!wallet.isActive) {
         throw new AppError("Wallet is blocked", 400);
       }
 
-      // Check sufficient balance
+      
       if (wallet.balance < amount) {
         throw new AppError("Insufficient balance", 400);
       }
 
-      // Update wallet balance
+      
       wallet.balance -= amount;
       await wallet.save({ session });
 
-      // Create transaction record
+      
       const transaction = await Transaction.create(
         [
           {
@@ -164,7 +163,7 @@ export const withdrawMoney = async (
   }
 };
 
-// Send money to another user (User)
+
 export const sendMoney = async (
   req: Request<{}, {}, SendMoneyInput>,
   res: Response,
@@ -180,7 +179,7 @@ export const sendMoney = async (
     const { receiverEmail, amount } = req.body;
 
     await session.withTransaction(async () => {
-      // Get sender's wallet
+      
       const senderWallet = await Wallet.findOne({
         userId: req.user!._id,
       }).session(session);
@@ -189,23 +188,23 @@ export const sendMoney = async (
         throw new AppError("Wallet not found", 404);
       }
 
-      // Check if sender's wallet is active
+      
       if (!senderWallet.isActive) {
         throw new AppError("Your wallet is blocked", 400);
       }
 
-      // Calculate fee
+      
       const { fee, feeType, feeValue } = calculateTransactionFee(
         "send",
         amount
       );
 
-      // Check sufficient balance (amount + fee)
+      
       if (senderWallet.balance < amount + fee) {
         throw new AppError("Insufficient balance", 400);
       }
 
-      // Get receiver user
+      
       const receiverUser = await User.findOne({ email: receiverEmail }).session(
         session
       );
@@ -214,7 +213,7 @@ export const sendMoney = async (
         throw new AppError("Receiver not found", 404);
       }
 
-      // Get receiver's wallet
+      
       const receiverWallet = await Wallet.findOne({
         userId: receiverUser._id,
       }).session(session);
@@ -223,19 +222,19 @@ export const sendMoney = async (
         throw new AppError("Receiver wallet not found", 404);
       }
 
-      // Check if receiver's wallet is active
+      
       if (!receiverWallet.isActive) {
         throw new AppError("Receiver wallet is blocked", 400);
       }
 
-      // Update wallets balance
+      
       senderWallet.balance -= amount + fee;
       receiverWallet.balance += amount;
 
       await senderWallet.save({ session });
       await receiverWallet.save({ session });
 
-      // Create transaction record
+      
       const transaction = await Transaction.create(
         [
           {
@@ -270,7 +269,7 @@ export const sendMoney = async (
   }
 };
 
-// Cash-in to user's wallet (Agent)
+
 export const cashIn = async (
   req: Request<{}, {}, CashInInput>,
   res: Response,
@@ -283,12 +282,12 @@ export const cashIn = async (
       return next(new AppError("You are not logged in!", 401));
     }
 
-    // Check if user is agent
+    
     if (req.user.role !== "agent") {
       return next(new AppError("Only agents can perform this action", 403));
     }
 
-    // Check if agent is approved
+    
     if (!req.user.isApproved) {
       return next(new AppError("Agent not approved", 403));
     }
@@ -296,7 +295,7 @@ export const cashIn = async (
     const { userEmail, amount } = req.body;
 
     await session.withTransaction(async () => {
-      // Check if agent's wallet is active
+      
       const agentWallet = await Wallet.findOne({
         userId: req.user!._id,
       }).session(session);
@@ -309,14 +308,14 @@ export const cashIn = async (
         throw new AppError("Agent wallet is blocked", 400);
       }
 
-      // Get user
+      
       const user = await User.findOne({ email: userEmail }).session(session);
 
       if (!user) {
         throw new AppError("User not found", 404);
       }
 
-      // Get user's wallet
+      
       const userWallet = await Wallet.findOne({ userId: user._id }).session(
         session
       );
@@ -325,16 +324,16 @@ export const cashIn = async (
         throw new AppError("User wallet not found", 404);
       }
 
-      // Check if user's wallet is active
+      
       if (!userWallet.isActive) {
         throw new AppError("User wallet is blocked", 400);
       }
 
-      // Update user's wallet balance
+      
       userWallet.balance += amount;
       await userWallet.save({ session });
 
-      // Create transaction record
+      
       const transaction = await Transaction.create(
         [
           {
@@ -365,7 +364,7 @@ export const cashIn = async (
   }
 };
 
-// Cash-out from user's wallet (Agent)
+
 export const cashOut = async (
   req: Request<{}, {}, CashOutInput>,
   res: Response,
@@ -378,12 +377,12 @@ export const cashOut = async (
       return next(new AppError("You are not logged in!", 401));
     }
 
-    // Check if user is agent
+    
     if (req.user.role !== "agent") {
       return next(new AppError("Only agents can perform this action", 403));
     }
 
-    // Check if agent is approved
+    
     if (!req.user.isApproved) {
       return next(new AppError("Agent not approved", 403));
     }
@@ -391,7 +390,7 @@ export const cashOut = async (
     const { userEmail, amount } = req.body;
 
     await session.withTransaction(async () => {
-      // Check if agent's wallet is active
+      
       const agentWallet = await Wallet.findOne({
         userId: req.user!._id,
       }).session(session);
@@ -404,14 +403,14 @@ export const cashOut = async (
         throw new AppError("Agent wallet is blocked", 400);
       }
 
-      // Get user
+      
       const user = await User.findOne({ email: userEmail }).session(session);
 
       if (!user) {
         throw new AppError("User not found", 404);
       }
 
-      // Get user's wallet
+      
       const userWallet = await Wallet.findOne({ userId: user._id }).session(
         session
       );
@@ -420,31 +419,31 @@ export const cashOut = async (
         throw new AppError("User wallet not found", 404);
       }
 
-      // Check if user's wallet is active
+      
       if (!userWallet.isActive) {
         throw new AppError("User wallet is blocked", 400);
       }
 
-      // Calculate fee
+      
       const { fee, feeType, feeValue } = calculateTransactionFee(
         "cash-out",
         amount
       );
 
-      // Check sufficient balance (amount + fee)
+      
       if (userWallet.balance < amount + fee) {
         throw new AppError("User has insufficient balance", 400);
       }
 
-      // Update user's wallet balance
+      
       userWallet.balance -= amount + fee;
       await userWallet.save({ session });
 
-      // Credit agent's wallet with commission (fee)
+      
       agentWallet.balance += fee;
       await agentWallet.save({ session });
 
-      // Create transaction record
+      
       const transaction = await Transaction.create(
         [
           {
@@ -454,7 +453,7 @@ export const cashOut = async (
             feeType,
             feeValue,
             fromWalletId: userWallet._id,
-            toWalletId: agentWallet._id, // Agent's wallet receives the fee as commission
+            toWalletId: agentWallet._id, 
             initiatedBy: req.user!._id,
             status: "completed",
           },
@@ -479,7 +478,7 @@ export const cashOut = async (
   }
 };
 
-// Get own transactions (User/Agent)
+
 export const getMyTransactions = async (
   req: Request,
   res: Response,
@@ -520,7 +519,7 @@ export const getMyTransactions = async (
   }
 };
 
-// Get all transactions (Admin)
+
 export const getAllTransactions = async (
   req: Request,
   res: Response,

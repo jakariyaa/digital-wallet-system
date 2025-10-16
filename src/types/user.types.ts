@@ -1,4 +1,4 @@
-// src/types/user.types.ts
+
 import mongoose from 'mongoose';
 
 export interface IUser {
@@ -7,7 +7,7 @@ export interface IUser {
   password: string;
   role: 'admin' | 'user' | 'agent';
   isActive: boolean;
-  isApproved?: boolean; // For agents
+  isApproved?: boolean; 
   createdAt: Date;
   updatedAt: Date;
 }

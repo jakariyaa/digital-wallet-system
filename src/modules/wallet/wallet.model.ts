@@ -1,4 +1,4 @@
-// src/modules/wallet/wallet.model.ts
+
 
 import mongoose, { Schema } from "mongoose";
 import { WalletDocument } from "../../types/wallet.types";
@@ -58,9 +58,9 @@ const walletSchema = new Schema<WalletDocument>(
   }
 );
 
-// Indexes
-// The 'unique: true' option on the userId field already creates an index
-// This line is intentionally left blank to avoid duplicate indexes
+
+
+
 
 const Wallet = mongoose.model<WalletDocument>("Wallet", walletSchema);
 
